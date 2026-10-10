@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiveM Loading Screen</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- 1. BACKGROUND MEDIA LAYER -->
+    <div id="background-layer">
+        <!-- Local Video Element -->
+        <video id="bg-video" class="bg-media" playsinline muted loop disablepictureinpicture></video>
+
+        <!-- YouTube Video IFrame Embed -->
+        <div id="bg-youtube-wrapper">
+            <iframe id="bg-youtube-frame" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+
+        <!-- Image Slideshow Container -->
+        <div id="bg-slider"></div>
+
+        <!-- Dark Gradient Overlay & Vignette for Readability -->
+        <div id="bg-overlay"></div>
+        <div id="bg-vignette"></div>
+    </div>
+
+    <!-- 2. AMBIENT PARTICLES & CURSOR SPOTLIGHT -->
+    <canvas id="particles-canvas"></canvas>
+    <div id="cursor-glow"></div>
+
+    <!-- 3. MAIN UI CONTAINER -->
+    <div id="app-container">
+
+        <!-- TOP ROW (Left Panel & Right Music Player) -->
+        <div class="top-row">
+
+            <!-- LEFT COLUMN: info panel (slides in from the left edge) -->
+            <div class="left-column">
+            <!-- Edge tab that opens the info panel (shown while the panel is closed) -->
+            <button id="panel-expand-btn" class="panel-tab" title="Bilgileri Göster">
+                <svg class="panel-tab-arrow" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                <span class="panel-tab-label">Bilgiler</span>
+                <svg class="panel-tab-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </button>
+
+            <!-- LEFT INFORMATION PANEL -->
+            <aside id="left-panel">
+                <!-- Server Brand Header -->
+                <div class="server-header">
+                    <div class="logo-wrapper">
+                        <img id="server-logo" class="server-logo" src="assets/logo.png" alt="Server Logo">
+                    </div>
+                    <div class="server-titles">
+                        <h1 id="server-name" class="server-name">LUMINA ROLEPLAY</h1>
+                        <p id="server-tagline" class="server-tagline">Yeni Nesil Şehir & Kaliteli Rol Deneyimi</p>
+                        <div class="status-badge">
+                            <span class="badge-dot"></span>
+                            <span id="status-badge-text">V2.5 • Çevrimiçi</span>
+                        </div>
+                    </div>
+                    <!-- Close / Collapse Button -->
+                    <button id="panel-collapse-btn" class="panel-collapse-btn" title="Bilgi Panelini Kapat / Gizle">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+
+                <!-- Tab Navigation Buttons -->
+                <nav class="tab-nav" id="tab-nav">
+                    <button class="tab-btn active" data-tab="staff">
+                        <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+                        <span>Ekip</span>
+                    </button>
+                    <button class="tab-btn" data-tab="rules">
+                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                        <span>Kurallar</span>
+                    </button>
+                    <button class="tab-btn" data-tab="keybinds">
+                        <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+                        <span>Tuşlar</span>
+                    </button>
+                    <button class="tab-btn" data-tab="gallery">
+                        <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <span>Galeri</span>
+                    </button>
+                </nav>
+
+                <!-- Tab Content Area -->
+                <div class="tab-content-area" id="tab-content-area">
+
+                    <!-- TAB 1: STAFF (rendered from Config.panel.tabs.staff) -->
+                    <div class="tab-pane active" id="tab-staff">
+                        <div class="staff-list" id="staff-list"></div>
+                    </div>
+
+                    <!-- TAB 2: RULES (rendered from Config.panel.tabs.rules) -->
+                    <div class="tab-pane" id="tab-rules">
+                        <div class="rules-list" id="rules-list"></div>
+                    </div>
+
+                    <!-- TAB 3: KEYBINDS (rendered from Config.panel.tabs.keybinds) -->
+                    <div class="tab-pane" id="tab-keybinds">
+                        <div class="keys-grid" id="keys-grid"></div>
+                    </div>
+
+                    <!-- TAB 4: GALLERY -->
+                    <div class="tab-pane" id="tab-gallery">
+                        <div class="gallery-container">
+                            <div class="gallery-display">
+                                <img id="gallery-img" class="gallery-img" src="assets/images/vinewood.png" alt="Server Photo">
+                                <button id="gallery-prev" class="gallery-nav-btn prev" title="Önceki">
+                                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                                </button>
+                                <button id="gallery-next" class="gallery-nav-btn next" title="Sonraki">
+                                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                                </button>
+                            </div>
+                            <div id="gallery-caption" class="gallery-caption">Vinewood Tepeleri & Gün Batımı Manzarası</div>
+                            <div id="gallery-dots" class="gallery-dots"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+            </div>
+
+            <!-- TOP RIGHT: mini game button + social / link buttons (rendered from Config.socials) -->
+            <div class="top-right">
+                <button id="minigame-open-btn" class="minigame-open-btn" title="Beklerken mini oyun oyna">
+                    <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                    <span>Mini Oyun</span>
+                </button>
+                <div id="social-bar" class="social-bar"></div>
+            </div>
+
+        </div>
+
+        <!-- SCREEN CENTER: PLAYER GREETING & ROTATING MESSAGE -->
+        <div id="player-greeting-dock">
+            <h2 class="greeting-title">
+                <span class="greeting-prefix">Hoş geldin,</span>
+                <span id="dock-player-name" class="neon-player-name">Oyuncu</span>
+            </h2>
+            <div id="rotating-status-message" class="rotating-status-message">Şehir sokakları senin için aydınlatılıyor, az bekle...</div>
+        </div>
+
+        <!-- BOTTOM LOADING DOCK -->
+        <footer id="bottom-dock">
+            <!-- LEFT: status + detailed log line (from FiveM onLogLine) -->
+            <div class="dock-left">
+                <div class="dock-spinner"></div>
+                <div class="dock-status-texts">
+                    <span id="status-main-text" class="status-main-text">Sunucu bağlantısı kuruluyor...</span>
+                    <span id="dock-log-line" class="dock-log-line">Kaynaklar hazırlanıyor...</span>
+                </div>
+            </div>
+
+            <!-- CENTER: progress bar + percentage -->
+            <div class="dock-center">
+                <div id="loading-bar-track" class="loading-bar-track">
+                    <div id="loading-bar-fill" class="loading-bar-fill"></div>
+                </div>
+                <div id="dock-percentage" class="dock-percentage">
+                    <span id="dock-percentage-value">0</span><span class="dock-percentage-sign">%</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: music player -->
+            <section id="music-player">
+                <!-- Sound source switch: playlist music / background video sound -->
+                <div class="source-switch" id="audio-source-switch">
+                    <button class="source-option" data-source="music" title="Şarkı listesini çal">
+                        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                        <span>Müzik</span>
+                    </button>
+                    <button class="source-option" data-source="video" title="Arka plan videosunun sesini çal">
+                        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                        <span>Video</span>
+                    </button>
+                </div>
+                <div class="player-main-info">
+                    <div class="disc-wrapper">
+                        <img id="album-cover" class="album-cover" src="assets/images/vinewood.png" alt="Album Cover">
+                        <div class="disc-center-dot"></div>
+                    </div>
+                    <div class="track-details">
+                        <div id="track-title" class="track-title">Lost in Night City</div>
+                        <div id="track-artist" class="track-artist">Lumina Radio</div>
+                    </div>
+                    <!-- Equalizer bars animation -->
+                    <div class="mini-eq" id="mini-eq">
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                    </div>
+                </div>
+
+                <!-- Autoplay Policy Prompt Button -->
+                <div id="autoplay-prompt" title="Müziği başlatmak için tıklayın">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                    <span>Müziği Başlatmak İçin Tıklayın</span>
+                </div>
+
+                <!-- Seek Bar -->
+                <div class="progress-container">
+                    <div class="progress-track-wrapper" id="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="time-stamps">
+                        <span id="current-time">00:00</span>
+                        <span id="duration-time">00:00</span>
+                    </div>
+                </div>
+
+                <!-- Controls Buttons -->
+                <div class="player-controls">
+                    <button class="control-btn" id="shuffle-btn" title="Karışık Çal">
+                        <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+                    </button>
+                    <button class="control-btn" id="prev-track-btn" title="Önceki Parça">
+                        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button class="control-btn play-pause-btn" id="play-pause-btn" title="Oynat / Duraklat (Space)">
+                        <svg id="play-pause-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="control-btn" id="next-track-btn" title="Sonraki Parça">
+                        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                    <button class="control-btn" id="repeat-btn" title="Tekrarla">
+                        <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                    </button>
+                </div>
+
+                <!-- Volume Slider & Mute -->
+                <div class="volume-row">
+                    <button class="mute-btn" id="mute-btn" title="Sesi Aç / Kapat">
+                        <svg id="mute-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="25" title="Ses Seviyesi">
+                </div>
+            </section>
+        </footer>
+
+    </div>
+
+    <!-- MINI GAME OVERLAY (background video / music pause while it is open) -->
+    <div id="minigame-overlay" class="minigame-overlay" hidden>
+        <canvas id="minigame-canvas"></canvas>
+
+        <!-- Top left: score card -->
+        <div class="minigame-scorecard">
+            <div id="minigame-scorebox" class="minigame-scorebox">
+                <span class="minigame-score-label">Skor</span>
+                <b id="minigame-score" class="minigame-score-value">0</b>
+                <span id="minigame-record" class="minigame-record" hidden>Yeni rekor</span>
+                <div id="minigame-gains" class="minigame-gains"></div>
+            </div>
+            <div class="minigame-substats">
+                <span>Son skor <b id="minigame-last">0</b></span>
+                <span>En iyi <b id="minigame-best">0</b></span>
+                <span>Uzunluk <b id="minigame-length">0</b></span>
+            </div>
+        </div>
+
+        <!-- Top center: real loading progress -->
+        <div class="minigame-loading">Sunucu yükleniyor <b><span id="minigame-loading">0</span>%</b></div>
+
+        <!-- Top right: close button + live ranking -->
+        <div class="minigame-side">
+            <button id="minigame-close" class="minigame-close">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                <span>Kapat</span>
+            </button>
+            <div class="minigame-rankcard">
+                <span class="minigame-rank-title">Sıralama</span>
+                <ol id="minigame-ranks" class="minigame-ranks"></ol>
+            </div>
+        </div>
+
+        <div id="minigame-banner" class="minigame-banner"></div>
+
+        <div class="minigame-hint">Fareyle yönlendir · Basılı tut veya Boşluk: hızlan · Altın yıldız: süper yem · Esc: kapat</div>
+
+        <div id="minigame-gameover" class="minigame-gameover" hidden>
+            <div class="minigame-skull">💀</div>
+            <h3 id="minigame-death-title">Yandın!</h3>
+            <p id="minigame-death-message" class="minigame-death-message"></p>
+            <p>Skor: <b id="minigame-final-score">0</b></p>
+            <button id="minigame-restart" class="minigame-restart">Tekrar Oyna</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION (Copy feedback etc.) -->
+    <div id="toast-notification">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span id="toast-text">Bağlantı panoya kopyalandı!</span>
+    </div>
+
+    <!-- JAVASCRIPT MODULES -->
+    <script src="config.js"></script>
+    <script src="js/background.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

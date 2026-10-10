@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>YouTube Relay</title>
+    <style>
+        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    </style>
+</head>
+<body>
+    <!--
+        YouTube aktarma sayfası. server/server.lua bu dosyayı oyun sunucusunun
+        http adresinden (http://sunucu:30120/loadscreen/yt) yayınlar. Böylece YouTube,
+        videoyu gömen sayfanın adresini görebilir ve oynatmayı reddetmez.
+        Yükleme ekranı ile YouTube oynatıcısı arasındaki mesajları olduğu gibi aktarır.
+    -->
+    <script>
+        (function () {
+            var videoId = new URLSearchParams(window.location.search).get('v') || '';
+            if (!/^[\w-]{11}$/.test(videoId)) return;
+
+            var params = new URLSearchParams({
+                autoplay: '1', mute: '1', controls: '0', loop: '1', playlist: videoId,
+                playsinline: '1', enablejsapi: '1', rel: '0', modestbranding: '1',
+                iv_load_policy: '3', disablekb: '1', fs: '0', origin: window.location.origin
+            });
+
+            var frame = document.createElement('iframe');
+            frame.allow = 'autoplay; encrypted-media';
+            frame.referrerPolicy = 'strict-origin-when-cross-origin';
+            frame.src = 'https://www.youtube.com/embed/' + videoId + '?' + params.toString();
+            document.body.appendChild(frame);
+
+            // Loading screen <-> YouTube player message relay
+            window.addEventListener('message', function (event) {
+                if (event.source === frame.contentWindow) {
+                    window.parent.postMessage(event.data, '*');
+                } else if (event.source === window.parent) {
+                    frame.contentWindow.postMessage(event.data, '*');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
